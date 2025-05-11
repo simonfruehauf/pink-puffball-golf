@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3 uid="uid://c1atdkk1keg48"]
+
+[ext_resource type="MeshLibrary" uid="uid://dbrcsbjf806xg" path="res://assets/1x1_cubes.tres" id="1_ig7tw"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ig7tw"]
+rough = true
+bounce = 0.6
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ig7tw"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_0xm2m"]
+
+[node name="Main" type="Node3D"]
+
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource("1_ig7tw")
+data = {
+"cells": PackedInt32Array(65535, 0, 2, 65534, 65535, 5, 65534, 0, 6, 65535, 65535, 1048579, 65533, 0, 1441793, 65533, 65535, 1441798, 65533, 65534, 1441798, 0, 65535, 6, 0, 0, 4, 65534, 65534, 5, 65535, 65534, 5, 0, 65534, 5)
+}
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 4, 0)
+physics_material_override = SubResource("PhysicsMaterial_ig7tw")
+gravity_scale = 2.0
+linear_damp = 0.75
+angular_damp = 0.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+shape = SubResource("SphereShape3D_ig7tw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+mesh = SubResource("SphereMesh_0xm2m")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, 0.353553, -0.612372, 8, 10, -10)
+projection = 1
+fov = 89.399
+size = 10.0
+near = 0.037
