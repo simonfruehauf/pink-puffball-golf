@@ -1,11 +1,10 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c4qr3ujr1x0qa"]
 
-[ext_resource type="Texture2D" uid="uid://dt8c242mv7ew3" path="res://assets/cubes/t_cube.jpg" id="1_vennq"]
+[ext_resource type="Texture2D" uid="uid://u0smh5xmp78o" path="res://assets/cubes/t_cube.png" id="1_vennq"]
 
 [resource]
 resource_name = "Material.001"
 cull_mode = 2
-shading_mode = 0
 albedo_texture = ExtResource("1_vennq")
 heightmap_deep_parallax = true
 heightmap_min_layers = 8
