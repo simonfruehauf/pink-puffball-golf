@@ -5,8 +5,8 @@ enum Modes {SHORT = 0, LONG = 1, JUMP = 2}
 @export var max_force: float = 25.0
 @export var force: float = 15.0
 @export var bounce_factor = 0.5
-@export var drag = 0.2
-@export var friction = 0.8
+@export var drag = 0.15
+@export var friction = 0.85
 var can_shoot = true
 var stop_below_velocity: float = 0.53
 var shotstart = false
@@ -92,27 +92,51 @@ func simulate(ball) -> Array[Vector3]:
 		ball.transform = self.transform
 		ball.velocity = Vector3.ZERO
 		ball.velocity += v * get_physics_process_delta_time()
+	
 	var path: Array[Vector3]
-	for i in range(1, 150):
+	var bounce_count = 0
+	var sim = true
+	var sim_buffer = 50 # simulate 50 frames longer 
+	var max_sim = 750
+	var cur_sim = 0
+	while sim || sim_buffer > 0:
+		cur_sim += 1
+	#for i in range(1, 150):
 		if ball != fake_ball:
 			await get_tree().create_timer(get_physics_process_delta_time()).timeout
+		
 		var collision = ball.move_and_collide(ball.velocity)
 		if collision:
 			var normal = collision.get_normal()
-			# Split velocity into normal (vertical) and tangent (horizontal) components
+			# split velocity into normal (vertical) and tangent (horizontal) components
 			var velocity_normal = ball.velocity.project(normal)
 			var velocity_tangent = ball.velocity - velocity_normal
-			# Apply bounce to the normal component
+			
+			var is_rolling = velocity_normal.length() < 0.1  # velocity treshold
+			
 			velocity_normal = velocity_normal.bounce(normal) * bounce_factor
-			# Apply friction to the tangent component (slows horizontal movement)
 			velocity_tangent *= (1.0 - friction * get_physics_process_delta_time())
 			ball.velocity = velocity_normal + velocity_tangent
+			
+			# only count it as a bounce if it's not rolling
+			if not is_rolling:
+				bounce_count += 1
+				if ball == fake_ball and bounce_count >= 2:
+					break
 		else:
 			ball.velocity -= gravity * get_physics_process_delta_time()
-		# Apply air resistance (drag) to all movement
 		ball.velocity *= (1.0 - drag * get_physics_process_delta_time())
 		
 		path.append(ball.global_position)
+		if ball.velocity.length() < 0.02:
+			#ball.velocity *= 0.99 * get_physics_process_delta_time() # add additional drag
+			sim = false
+			sim_buffer -= 1
+		if ball.velocity.length() > 0.02:
+			sim = true
+			sim_buffer = 50
+		if cur_sim > max_sim:
+			break
 	if ball != fake_ball:
 		ball.freeze = true
 		ball.can_shoot = true
